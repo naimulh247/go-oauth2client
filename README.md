@@ -19,26 +19,47 @@ go get github.com/naimulh247/go-oauth2client
 Here's a basic example of how to use this OAuth2 client:
 
 ```go
-import "github.com/naimulh247/go-oauth2client"
+package main
 
-client := oauth2client.NewOAuth2Client(
-    "your-client-id",
-    "https://auth.example.com/authorize",
-    "https://auth.example.com/token",
-    "https://your-app.com/callback"
+import (
+	"fmt"
+	"log"
+
+	"github.com/naimulh247/go-oauth2client"
 )
 
-// Generate an authorization URL
-authURL, err := client.CreateAuthorizationURL(oauth2client.AuthorizationURLOptions{
-    State: "your-state",
-    Scopes: []string{"read", "write"},
-})
+func main() {
+	client := oauth2client.NewOAuth2Client(
+		"your-client-id",
+		"https://auth.example.com/authorize",
+		"https://auth.example.com/token",
+		"https://your-app.com/callback",
+	)
 
-// After receiving the authorization code...
-token, err := client.ValidateAuthorizationCode("received-code", oauth2client.ValidateAuthorizationCodeOptions{})
+	// Generate an authorization URL
+	authURL, err := client.CreateAuthorizationURL(oauth2client.AuthorizationURLOptions{
+		State:  "your-state",
+		Scopes: []string{"read", "write"},
+	})
+	if err != nil {
+		log.Fatalf("Error creating authorization URL: %v", err)
+	}
+	fmt.Printf("Authorization URL: %s\n", authURL)
 
-// Refreshing a token
-newToken, err := client.RefreshAccessToken("refresh-token", oauth2client.RefreshAccessTokenOptions{})
+	// After receiving the authorization code...
+	token, err := client.ValidateAuthorizationCode("received-code", oauth2client.ValidateAuthorizationCodeOptions{})
+	if err != nil {
+		log.Fatalf("Error validating authorization code: %v", err)
+	}
+	fmt.Printf("Received token: %+v\n", token)
+
+	// Refreshing a token
+	newToken, err := client.RefreshAccessToken("refresh-token", oauth2client.RefreshAccessTokenOptions{})
+	if err != nil {
+		log.Fatalf("Error refreshing token: %v", err)
+	}
+	fmt.Printf("New token: %+v\n", newToken)
+}
 ```
 
 ## Contributing
